@@ -1,9 +1,12 @@
 package kcsit.pt.bookstore.di
 
+import android.app.Application
+import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kcsit.pt.bookstore.data.cache.BookstoreDatabase
 import kcsit.pt.bookstore.data.remote.BookstoreApi
 import kcsit.pt.bookstore.data.repository.BookstoreRepositoryImpl
 import kcsit.pt.bookstore.domain.repository.BookstoreRepository
@@ -32,5 +35,13 @@ object BookstoreModule {
 
     @Singleton
     @Provides
-    fun provideBookstoreRepository(bookstoreApi: BookstoreApi): BookstoreRepository = BookstoreRepositoryImpl(bookstoreApi = bookstoreApi)
+    fun provideBookstoreRepository(bookstoreApi: BookstoreApi, db: BookstoreDatabase): BookstoreRepository =
+        BookstoreRepositoryImpl(bookstoreApi = bookstoreApi, bookstoreDAO = db.bookstoreDao)
+
+    @Singleton
+    @Provides
+    fun provideBookstoreDatabase(
+        app: Application,
+    ): BookstoreDatabase =
+        Room.databaseBuilder(app, BookstoreDatabase::class.java, "bookstoreDb").build()
 }

@@ -1,6 +1,7 @@
 package kcsit.pt.bookstore.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import kcsit.pt.bookstore.data.cache.entity.AuthorEntity
 import kcsit.pt.bookstore.domain.model.ImageLinks
 import kcsit.pt.bookstore.domain.model.VolumeInfo
 

@@ -1,6 +1,7 @@
 package kcsit.pt.bookstore.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import kcsit.pt.bookstore.data.cache.entity.BookEntity
 import kcsit.pt.bookstore.domain.model.*
 
 data class ItemDto(
@@ -24,5 +25,16 @@ data class ItemDto(
             "",
             ""
         )
+    )
+
+    fun toBookEntity() = BookEntity(
+        bookId = id,
+        buyLink = saleInfo?.buyLink ?: "",
+        amount = saleInfo?.listPrice?.amount ?: 0.0,
+        currencyCode = saleInfo?.listPrice?.currencyCode ?: "",
+        thumbnail = volumeInfo?.imageLinks?.thumbnail ?: "",
+        description = volumeInfo?.description ?: "",
+        subtitle = volumeInfo?.subtitle ?: "",
+        title = volumeInfo?.title ?: ""
     )
 }
