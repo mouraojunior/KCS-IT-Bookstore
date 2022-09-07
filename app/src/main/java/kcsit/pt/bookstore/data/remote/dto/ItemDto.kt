@@ -11,7 +11,7 @@ data class ItemDto(
     @SerializedName("volumeInfo")
     val volumeInfo: VolumeInfoDto?,
 ) {
-    fun toItem() = Item(
+    fun toBook() = Book(
         id = id,
         saleInfo = saleInfo?.toSaleInfo() ?: SaleInfo(
             "",

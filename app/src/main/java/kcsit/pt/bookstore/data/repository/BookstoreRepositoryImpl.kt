@@ -1,7 +1,7 @@
 package kcsit.pt.bookstore.data.repository
 
 import kcsit.pt.bookstore.data.remote.BookstoreApi
-import kcsit.pt.bookstore.domain.model.Item
+import kcsit.pt.bookstore.domain.model.Book
 import kcsit.pt.bookstore.domain.repository.BookstoreRepository
 import kcsit.pt.bookstore.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,7 @@ class BookstoreRepositoryImpl @Inject constructor(
         query: String,
         maxResults: Int,
         startIndex: Int,
-    ): Flow<Resource<List<Item>>> =
+    ): Flow<Resource<List<Book>>> =
         flow {
             emit(Resource.Loading())
             try {
@@ -30,7 +30,7 @@ class BookstoreRepositoryImpl @Inject constructor(
 
                 if (books == null || books.isEmpty())
                     emit(Resource.Success(emptyList()))
-                else emit(Resource.Success(books.map { it.toItem() }.filter { it.volumeInfo.authors.isNotEmpty() }))
+                else emit(Resource.Success(books.map { it.toBook() }.filter { it.volumeInfo.authors.isNotEmpty() }))
 
             } catch (e: Exception) {
                 Timber.e("${e.message}\n${e.localizedMessage}\n${e.printStackTrace()}")
