@@ -15,10 +15,7 @@ class BookstoreListAdapter :
     class BookstoreListViewHolder(private val binding: BookListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bindBook(book: Book) {
-            binding.apply {
-                tvBookTitle.text = book.volumeInfo.title
-                imgvBook.load(book.volumeInfo.imageLinks.thumbnail.replace("http", "https"))
-            }
+            binding.imgvBook.load(book.volumeInfo.imageLinks.thumbnail.replace("http", "https"))
         }
     }
 

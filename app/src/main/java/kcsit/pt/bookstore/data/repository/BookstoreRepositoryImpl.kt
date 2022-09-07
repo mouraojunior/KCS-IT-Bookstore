@@ -30,8 +30,8 @@ class BookstoreRepositoryImpl @Inject constructor(
 
                 if (books == null || books.isEmpty())
                     emit(Resource.Success(emptyList()))
-                else emit(Resource.Success(books.map { it.toBook() }.filter { it.volumeInfo.authors.isNotEmpty() }))
-
+                else emit(Resource.Success(books.map { it.toBook() }
+                    .filter { (it.volumeInfo.authors.isNotEmpty() && it.volumeInfo.imageLinks.thumbnail.isNotEmpty()) }))
             } catch (e: Exception) {
                 Timber.e("${e.message}\n${e.localizedMessage}\n${e.printStackTrace()}")
                 emit(Resource.Error("An unexpected error has occurred."))
