@@ -100,7 +100,7 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bookDetailsViewModel.bookDetailState
-                    .collectLatest { bookState ->
+                    .collect { bookState ->
                         when (bookState) {
                             is Resource.Error -> {
                                 requireContext().makeToast(bookState.message ?: "An unexpected error has occurred.")

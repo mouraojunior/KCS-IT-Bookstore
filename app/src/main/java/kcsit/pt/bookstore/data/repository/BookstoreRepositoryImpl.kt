@@ -63,7 +63,7 @@ class BookstoreRepositoryImpl @Inject constructor(
                     Timber.e("${e.message}\n${e.localizedMessage}\n${e.printStackTrace()}")
                     emit(Resource.Error("An unexpected error has occurred."))
                 }
-            } else emit(Resource.Error("Internet connection is unavailable. Please try again later."))
+            }
         }
 
     override suspend fun getVolumeById(
@@ -73,7 +73,6 @@ class BookstoreRepositoryImpl @Inject constructor(
         flow {
             emit(Resource.Loading())
             emit(Resource.Success(bookstoreDAO.getBookWithAuthorsByBookId(bookId).toBook()))
-
             if (hasInternetConnection) {
                 try {
                     val response = bookstoreApi.getVolumeById(
@@ -103,6 +102,6 @@ class BookstoreRepositoryImpl @Inject constructor(
                     Timber.e("${e.message}\n${e.localizedMessage}\n${e.printStackTrace()}")
                     emit(Resource.Error("An unexpected error has occurred."))
                 }
-            } else emit(Resource.Error("Internet connection is unavailable. Please try again later."))
+            }
         }
 }
