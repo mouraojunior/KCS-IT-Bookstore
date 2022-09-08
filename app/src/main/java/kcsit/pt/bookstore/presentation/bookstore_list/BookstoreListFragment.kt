@@ -7,28 +7,37 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kcsit.pt.bookstore.R
 import kcsit.pt.bookstore.databinding.FragmentBookstoreListBinding
 import kcsit.pt.bookstore.presentation.adapters.BookstoreListAdapter
+import kcsit.pt.bookstore.util.Extensions.isNetworkAvailable
+import kcsit.pt.bookstore.util.Extensions.makeToast
+import kcsit.pt.bookstore.util.Extensions.safeNavigate
+import kcsit.pt.bookstore.util.Resource
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
     private lateinit var bookstoreListBinding: FragmentBookstoreListBinding
     private val bookstoreListViewModel: BookstoreListViewModel by viewModels()
-    private val bookstoreListAdapter = BookstoreListAdapter()
-
+    private lateinit var bookstoreListAdapter: BookstoreListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bookstoreListBinding = FragmentBookstoreListBinding.bind(view)
 
+        createAdapterAndItemClick()
+        getBooks()
         setBookstoreRecyclerView()
         collectObservables()
+    }
+
+    private fun getBooks() {
+        bookstoreListViewModel.onEvent(BookListEvent.GetBooks(requireContext().isNetworkAvailable()))
     }
 
     private fun setBookstoreRecyclerView() {
@@ -41,13 +50,32 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
         }
     }
 
+    private fun createAdapterAndItemClick() {
+        bookstoreListAdapter = BookstoreListAdapter(
+            onItemClick = { book ->
+                findNavController().safeNavigate(
+                    BookstoreListFragmentDirections.actionBookstoreListFragmentToBookDetailsFragment(book.id)
+                )
+            }
+        )
+    }
+
     private fun collectObservables() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bookstoreListViewModel.bookstoreItemsState
-                    .collectLatest {
-                        Timber.e("DATA RECEIVED: ${it.data}")
-                        bookstoreListAdapter.submitList(it.data ?: emptyList())
+                    .collectLatest { bookListState ->
+                        when (bookListState) {
+                            is Resource.Error -> {
+                                requireContext().makeToast(bookListState.message ?: "An unexpected error has occurred.")
+                                bookstoreListBinding.pbLoading.visibility = View.GONE
+                            }
+                            is Resource.Loading -> bookstoreListBinding.pbLoading.visibility = View.VISIBLE
+                            is Resource.Success -> {
+                                bookstoreListBinding.pbLoading.visibility = View.GONE
+                                bookstoreListAdapter.submitList(bookListState.data ?: emptyList())
+                            }
+                        }
                     }
             }
         }

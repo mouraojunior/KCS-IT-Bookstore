@@ -19,13 +19,15 @@ class BookstoreListViewModel @Inject constructor(
     private val _bookstoreItemsState = MutableSharedFlow<Resource<List<Book>>>()
     val bookstoreItemsState = _bookstoreItemsState.asSharedFlow()
 
-    init {
-        getBooksVolumes()
+    fun onEvent(event: BookListEvent) {
+        when (event) {
+            is BookListEvent.GetBooks -> getBooksVolumes(event.hasInternetConnection)
+        }
     }
 
-    private fun getBooksVolumes() {
+    private fun getBooksVolumes(hasInternetConnection: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            bookstoreRepository.getVolumes().collect { bookstoreState ->
+            bookstoreRepository.getVolumes(hasInternetConnection).collect { bookstoreState ->
                 when (bookstoreState) {
                     is Resource.Error -> {
                         _bookstoreItemsState.emit(Resource.Loading(false))

@@ -7,8 +7,14 @@ import kotlinx.coroutines.flow.Flow
 
 interface BookstoreRepository {
     suspend fun getVolumes(
+        hasInternetConnection: Boolean,
         query: String = Constants.QUERY_BOOKS_MOBILE,
         maxResults: Int = Constants.BASE_MAX_RESULTS,
         startIndex: Int = Constants.BASE_START_INDEX,
     ): Flow<Resource<List<Book>>>
+
+    suspend fun getVolumeById(
+        hasInternetConnection: Boolean,
+        bookId: String,
+    ): Flow<Resource<Book>>
 }

@@ -12,6 +12,10 @@ interface BookstoreDAO {
     @Query("SELECT * FROM tbBook")
     fun getBooksWithAuthors(): List<BookWithAuthors>
 
+    @Transaction
+    @Query("SELECT * FROM tbBook WHERE bookId = :bookId")
+    fun getBookWithAuthorsByBookId(bookId: String): BookWithAuthors
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertBooks(books: List<BookEntity>)
 

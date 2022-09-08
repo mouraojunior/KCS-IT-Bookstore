@@ -9,14 +9,21 @@ import coil.load
 import kcsit.pt.bookstore.databinding.BookListItemBinding
 import kcsit.pt.bookstore.domain.model.Book
 
-class BookstoreListAdapter :
+class BookstoreListAdapter(
+    private val onItemClick: (Book) -> Unit,
+) :
     ListAdapter<Book, BookstoreListAdapter.BookstoreListViewHolder>(BookstoreComparator()) {
 
-    class BookstoreListViewHolder(private val binding: BookListItemBinding) :
+    inner class BookstoreListViewHolder(private val binding: BookListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bindBook(book: Book) {
             binding.imgvBook.load(book.volumeInfo.imageLinks.thumbnail
                 .replace("http", "https"))
+
+            binding.root.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) onItemClick(getItem(adapterPosition))
+            }
         }
     }
 
