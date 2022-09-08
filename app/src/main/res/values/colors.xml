@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0f3858</color>
-    <color name="colorPrimaryDark">#0B283D</color>
+    <color name="colorPrimary">#1F1F1F</color>
+    <color name="colorPrimaryDark">#1F1F1F</color>
     <color name="colorAccent">#1babe3</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="tv_title_color">#C9C9C9</color>
+    <color name="tv_subtitle_color">#888888</color>
+    <color name="fragment_background">#1F1F1F</color>
 </resources>

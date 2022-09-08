@@ -7,6 +7,12 @@
     <fragment
         android:id="@+id/bookstoreListFragment"
         android:name="kcsit.pt.bookstore.presentation.bookstore_list.BookstoreListFragment"
-        android:label="fragment_bookstore_list"
+        android:label="KCS IT Bookstore"
         tools:layout="@layout/fragment_bookstore_list" />
+
+    <fragment
+        android:id="@+id/bookDetailsFragment"
+        android:name="kcsit.pt.bookstore.presentation.book_details.BookDetailsFragment"
+        android:label="Details"
+        tools:layout="@layout/fragment_book_details" />
 </navigation>
