@@ -25,6 +25,16 @@ class BookDetailsViewModel @Inject constructor(
                 event.hasInternetConnection,
                 event.bookId
             )
+            is BookDetailsEvent.UpdateFavoriteBook -> updateFavoriteBook(event.isFavorite, event.bookId)
+        }
+    }
+
+    private fun updateFavoriteBook(isFavorite: Boolean, bookId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            bookstoreRepository.updateFavoriteBook(
+                isFavorite = isFavorite,
+                bookId = bookId
+            )
         }
     }
 

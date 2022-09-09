@@ -3,10 +3,12 @@ package kcsit.pt.bookstore.presentation.book_details
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,8 +24,9 @@ import kcsit.pt.bookstore.util.Extensions.isNetworkAvailable
 import kcsit.pt.bookstore.util.Extensions.makeToast
 import kcsit.pt.bookstore.util.Extensions.toVerticalString
 import kcsit.pt.bookstore.util.Resource
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
+
 
 @AndroidEntryPoint
 class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
@@ -31,6 +34,7 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
     private val bookDetailsViewModel: BookDetailsViewModel by viewModels()
     private val bookIdArgs: BookDetailsFragmentArgs by navArgs()
     private lateinit var bookId: String
+    private var isFavorite: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,6 +43,48 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
         getArgs()
         getBookById()
         collectObservables()
+        createMenu()
+    }
+
+    private fun createMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_details, menu)
+                setFavoriteMenuIcon(menu[0])
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.menu_details_favorite_unfavorite -> {
+                        isFavorite = !isFavorite
+                        updateFavoriteBook(isFavorite = isFavorite)
+                        setFavoriteMenuIcon(menuItem)
+                        true
+                    }
+                else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun setFavoriteMenuIcon(menuItemFavorite: MenuItem) {
+        Timber.e("setFavoriteMenuIcon: FAVORITE $isFavorite")
+        if (isFavorite) {
+            menuItemFavorite.icon = ContextCompat.getDrawable(
+                requireContext(), R.drawable.ic_favorite_selected_24)
+            menuItemFavorite.title = getString(R.string.unfavorite_book)
+        } else {
+            menuItemFavorite.icon = ContextCompat.getDrawable(
+                requireContext(), R.drawable.ic_favorite_unselected_24)
+            menuItemFavorite.title = getString(R.string.favorite_book)
+        }
+    }
+
+    private fun updateFavoriteBook(isFavorite: Boolean) {
+        bookDetailsViewModel.onEvent(BookDetailsEvent.UpdateFavoriteBook(
+            isFavorite = isFavorite,
+            bookId = bookId
+        ))
     }
 
     private fun bindBookDetails(book: Book?) {
@@ -48,7 +94,7 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
                     .replace("http://", "https://"))
                 txTitle.text = it.volumeInfo.title
                 if (it.volumeInfo.description.isEmpty()) {
-                    txDescription.text = "Description not available"
+                    txDescription.text = getString(R.string.description_not_available)
                     txDescription.gravity = Gravity.CENTER
                 } else txDescription.text = it.volumeInfo.description
                 txAuthors.text = it.volumeInfo.authors.toVerticalString()
@@ -62,7 +108,7 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
                     || bookBuyLink.isEmpty()
                 ) {
                     btnBuyNow.apply {
-                        text = "Book Unavailable"
+                        text = context.getString(R.string.book_not_available)
                         alpha = 0.5f
                         isClickable = false
                     }
@@ -94,6 +140,7 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
 
     private fun getArgs() {
         bookId = bookIdArgs.bookId
+        isFavorite = bookIdArgs.isFavorite
     }
 
     private fun collectObservables() {

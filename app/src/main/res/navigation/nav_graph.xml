@@ -23,5 +23,9 @@
             android:name="bookId"
             app:argType="string"
             app:nullable="false" />
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean"
+            app:nullable="false" />
     </fragment>
 </navigation>

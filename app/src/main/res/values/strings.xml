@@ -5,4 +5,8 @@
     <string name="book_image_description">Book\'s image</string>
     <string name="description">Description</string>
     <string name="authors">Authors</string>
+    <string name="favorite_book">Favorite</string>
+    <string name="unfavorite_book">Unfavorite</string>
+    <string name="description_not_available">Description not available</string>
+    <string name="book_not_available">Book not available</string>
 </resources>

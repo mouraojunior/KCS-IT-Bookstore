@@ -19,6 +19,7 @@ data class BookWithAuthors(
 ) {
     fun toBook() = Book(
         id = book.bookId,
+        isFavorite = book.isFavorite,
         saleInfo = SaleInfo(book.buyLink,
             ListPrice(book.amount, book.currencyCode)),
         VolumeInfo(authors = authors.map { it.authorNameId },

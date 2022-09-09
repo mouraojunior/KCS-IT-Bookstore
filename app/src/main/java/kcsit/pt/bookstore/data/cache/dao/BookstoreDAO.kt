@@ -19,6 +19,9 @@ interface BookstoreDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertBooks(books: List<BookEntity>)
 
+    @Query("Update tbBook SET isFavorite = :isFavorite WHERE bookId = :bookId")
+    suspend fun updateFavoriteBook(isFavorite: Boolean, bookId: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAuthors(authors: List<AuthorEntity>)
 

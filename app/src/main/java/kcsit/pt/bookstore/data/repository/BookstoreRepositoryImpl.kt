@@ -104,4 +104,8 @@ class BookstoreRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun updateFavoriteBook(isFavorite: Boolean, bookId: String) {
+        bookstoreDAO.updateFavoriteBook(isFavorite = isFavorite, bookId = bookId)
+    }
 }

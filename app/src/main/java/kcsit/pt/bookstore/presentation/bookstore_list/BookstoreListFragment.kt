@@ -17,9 +17,7 @@ import kcsit.pt.bookstore.util.Extensions.isNetworkAvailable
 import kcsit.pt.bookstore.util.Extensions.makeToast
 import kcsit.pt.bookstore.util.Extensions.safeNavigate
 import kcsit.pt.bookstore.util.Resource
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
@@ -55,7 +53,9 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
         bookstoreListAdapter = BookstoreListAdapter(
             onItemClick = { book ->
                 findNavController().safeNavigate(
-                    BookstoreListFragmentDirections.actionBookstoreListFragmentToBookDetailsFragment(book.id)
+                    BookstoreListFragmentDirections.actionBookstoreListFragmentToBookDetailsFragment(
+                        book.id,
+                        book.isFavorite)
                 )
             }
         )

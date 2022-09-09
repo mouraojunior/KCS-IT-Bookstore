@@ -17,4 +17,9 @@ interface BookstoreRepository {
         hasInternetConnection: Boolean,
         bookId: String,
     ): Flow<Resource<Book>>
+
+    suspend fun updateFavoriteBook(
+        isFavorite: Boolean,
+        bookId: String,
+    )
 }
