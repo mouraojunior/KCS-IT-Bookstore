@@ -1,7 +1,13 @@
 package kcsit.pt.bookstore.presentation.bookstore_list
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,6 +24,7 @@ import kcsit.pt.bookstore.util.Extensions.makeToast
 import kcsit.pt.bookstore.util.Extensions.safeNavigate
 import kcsit.pt.bookstore.util.Resource
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
@@ -30,13 +37,16 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
         bookstoreListBinding = FragmentBookstoreListBinding.bind(view)
 
         createAdapterAndItemClick()
-        getBooks()
+        getBooks(bookstoreListViewModel.isFilterActive())
         setBookstoreRecyclerView()
         collectObservables()
+        createMenu()
     }
 
-    private fun getBooks() {
-        bookstoreListViewModel.onEvent(BookListEvent.GetBooks(requireContext().isNetworkAvailable()))
+    private fun getBooks(isFilterActive: Boolean) {
+        bookstoreListViewModel.onEvent(BookListEvent.GetBooks(
+            hasInternetConnection = requireContext().isNetworkAvailable(),
+        isFilterActive = isFilterActive))
     }
 
     private fun setBookstoreRecyclerView() {
@@ -59,6 +69,41 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
                 )
             }
         )
+    }
+
+    private fun createMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_list, menu)
+                setFilterMenuIcon(menu[0])
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.menu_list_filter_favorite -> {
+                        if (bookstoreListViewModel.isFilterActive())
+                            bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = false))
+                        else bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = true))
+                        getBooks(bookstoreListViewModel.isFilterActive())
+                        setFilterMenuIcon(menuItem)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun setFilterMenuIcon(menuItemFavorite: MenuItem) {
+        if (bookstoreListViewModel.isFilterActive()) {
+            menuItemFavorite.icon = ContextCompat.getDrawable(
+                requireContext(), R.drawable.ic_unfilter_list_24)
+            menuItemFavorite.title = getString(R.string.unfilter_by_favorite)
+        } else {
+            menuItemFavorite.icon = ContextCompat.getDrawable(
+                requireContext(), R.drawable.ic_filter_list_24)
+            menuItemFavorite.title = getString(R.string.filter_by_favorite)
+        }
     }
 
     private fun collectObservables() {

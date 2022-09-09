@@ -68,7 +68,6 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
     }
 
     private fun setFavoriteMenuIcon(menuItemFavorite: MenuItem) {
-        Timber.e("setFavoriteMenuIcon: FAVORITE $isFavorite")
         if (isFavorite) {
             menuItemFavorite.icon = ContextCompat.getDrawable(
                 requireContext(), R.drawable.ic_favorite_selected_24)

@@ -9,4 +9,6 @@
     <string name="unfavorite_book">Unfavorite</string>
     <string name="description_not_available">Description not available</string>
     <string name="book_not_available">Book not available</string>
+    <string name="filter_by_favorite">Filter by favorite</string>
+    <string name="unfilter_by_favorite">Unfilter by favorite</string>
 </resources>

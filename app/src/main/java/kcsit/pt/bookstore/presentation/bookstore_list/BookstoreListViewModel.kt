@@ -19,15 +19,23 @@ class BookstoreListViewModel @Inject constructor(
     private val _bookstoreItemsState = MutableSharedFlow<Resource<List<Book>>>()
     val bookstoreItemsState = _bookstoreItemsState.asSharedFlow()
 
+    private var _isFilterActive: Boolean = false
+
     fun onEvent(event: BookListEvent) {
         when (event) {
-            is BookListEvent.GetBooks -> getBooksVolumes(event.hasInternetConnection)
+            is BookListEvent.GetBooks -> getBooksVolumes(event.hasInternetConnection, event.isFilterActive)
+            is BookListEvent.SetFilter -> _isFilterActive = event.isFilterActive
         }
     }
 
-    private fun getBooksVolumes(hasInternetConnection: Boolean) {
+    fun isFilterActive(): Boolean = _isFilterActive
+
+    private fun getBooksVolumes(hasInternetConnection: Boolean, isFilterActive: Boolean) {
+        _isFilterActive = isFilterActive
         viewModelScope.launch(Dispatchers.IO) {
-            bookstoreRepository.getVolumes(hasInternetConnection).collect { bookstoreState ->
+            bookstoreRepository.getVolumes(
+                hasInternetConnection = hasInternetConnection,
+                isFilterActive = isFilterActive).collect { bookstoreState ->
                 when (bookstoreState) {
                     is Resource.Error -> {
                         _bookstoreItemsState.emit(Resource.Loading(false))

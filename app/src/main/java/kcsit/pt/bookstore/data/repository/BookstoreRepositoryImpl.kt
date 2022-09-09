@@ -18,13 +18,17 @@ class BookstoreRepositoryImpl @Inject constructor(
 ) : BookstoreRepository {
     override suspend fun getVolumes(
         hasInternetConnection: Boolean,
+        isFilterActive: Boolean,
         query: String,
         maxResults: Int,
         startIndex: Int,
     ): Flow<Resource<List<Book>>> =
         flow {
             emit(Resource.Loading())
-            emit(Resource.Success(bookstoreDAO.getBooksWithAuthors().map { it.toBook() }))
+            if (isFilterActive) emit(Resource.Success(bookstoreDAO.getBooksWithAuthors()
+                .filter { it.book.isFavorite }
+                .map { it.toBook() }))
+            else emit(Resource.Success(bookstoreDAO.getBooksWithAuthors().map { it.toBook() }))
             if (hasInternetConnection) {
                 try {
                     val response = bookstoreApi.getVolumes(
@@ -57,7 +61,10 @@ class BookstoreRepositoryImpl @Inject constructor(
                             insertAuthors(authors = authors.map { AuthorEntity(it) })
                             insertBooksAuthorsCrossRef(booksAuthorsCrossRef = booksAuthorsCrossRef)
                         }
-                        emit(Resource.Success(bookstoreDAO.getBooksWithAuthors().map { it.toBook() }))
+                        if (isFilterActive) emit(Resource.Success(bookstoreDAO.getBooksWithAuthors()
+                            .filter { it.book.isFavorite }
+                            .map { it.toBook() }))
+                        else emit(Resource.Success(bookstoreDAO.getBooksWithAuthors().map { it.toBook() }))
                     }
                 } catch (e: Exception) {
                     Timber.e("${e.message}\n${e.localizedMessage}\n${e.printStackTrace()}")
