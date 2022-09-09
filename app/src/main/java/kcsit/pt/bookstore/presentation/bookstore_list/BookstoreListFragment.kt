@@ -23,7 +23,9 @@ import kcsit.pt.bookstore.util.Extensions.isNetworkAvailable
 import kcsit.pt.bookstore.util.Extensions.makeToast
 import kcsit.pt.bookstore.util.Extensions.safeNavigate
 import kcsit.pt.bookstore.util.Resource
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
@@ -40,7 +42,6 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
         collectObservables()
         createMenu()
         getBooks(requireContext().isNetworkAvailable(), bookstoreListViewModel.isFilterActive())
-
     }
 
     private fun getBooks(hasInternetConnection: Boolean, isFilterActive: Boolean) {
@@ -82,9 +83,11 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
                 return when (menuItem.itemId) {
                     R.id.menu_list_filter_favorite -> {
                         if (bookstoreListViewModel.isFilterActive()) {
+                            Timber.e("IF")
                             bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = false))
                             getBooks(hasInternetConnection = requireContext().isNetworkAvailable(), bookstoreListViewModel.isFilterActive())
                         } else {
+                            Timber.e("ELSE")
                             bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = true))
                             getBooks(hasInternetConnection = false, bookstoreListViewModel.isFilterActive())
                         }
@@ -113,7 +116,7 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bookstoreListViewModel.bookstoreItemsState
-                    .collect { bookListState ->
+                    .collectLatest { bookListState ->
                         when (bookListState) {
                             is Resource.Error -> {
                                 requireContext().makeToast(bookListState.message ?: "An unexpected error has occurred.")

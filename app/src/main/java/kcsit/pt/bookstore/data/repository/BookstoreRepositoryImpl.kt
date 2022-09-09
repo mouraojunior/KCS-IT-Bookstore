@@ -54,7 +54,7 @@ class BookstoreRepositoryImpl @Inject constructor(
                 BookWithAuthorsPagingData.map { bookWithAuthors ->
                     bookWithAuthors.toBook()
                 }
-            }.collect {
+            }.collectLatest {
                 send(Resource.Success(it))
             }
         } catch (e: Exception) {

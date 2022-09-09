@@ -41,8 +41,6 @@ class BookstoreListViewModel @Inject constructor(
             bookstoreRepository.getVolumes(
                 hasInternetConnection = hasInternetConnection,
                 isFilterActive = isFilterActive).collect { bookstoreState ->
-//                _bookstoreItemsState.emit(bookstoreState)
-
                 when (bookstoreState) {
                     is Resource.Error -> {
                         _bookstoreItemsState.emit(Resource.Loading(false))
