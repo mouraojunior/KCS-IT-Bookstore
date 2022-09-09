@@ -19,7 +19,9 @@ class BookstoreListAdapter(
 
         fun bindBook(book: Book) {
             binding.imgvBook.load(book.volumeInfo.imageLinks.thumbnail
-                .replace("http", "https"))
+                .replace("http", "https")){
+                crossfade(true)
+            }
 
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION)

@@ -89,7 +89,9 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
         book?.let {
             bookDetailsBinding.apply {
                 imgBookImage.load(it.volumeInfo.imageLinks.thumbnail
-                    .replace("http://", "https://"))
+                    .replace("http://", "https://")) {
+                    crossfade(true)
+                }
                 txTitle.text = it.volumeInfo.title
                 if (it.volumeInfo.description.isEmpty()) {
                     txDescription.text = getString(R.string.description_not_available)
