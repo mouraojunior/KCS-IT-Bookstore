@@ -1,5 +1,6 @@
 package kcsit.pt.bookstore.data.cache.dao
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import kcsit.pt.bookstore.data.cache.BookWithAuthors
 import kcsit.pt.bookstore.data.cache.entity.AuthorEntity
@@ -10,7 +11,11 @@ import kcsit.pt.bookstore.data.cache.entity.BookEntity
 interface BookstoreDAO {
     @Transaction
     @Query("SELECT * FROM tbBook")
-    fun getBooksWithAuthors(): List<BookWithAuthors>
+    fun getBooksWithAuthors(): PagingSource<Int, BookWithAuthors>
+
+    @Transaction
+    @Query("SELECT * FROM tbBook WHERE isFavorite = 1")
+    fun getBooksWithAuthorsByFavorite(): PagingSource<Int, BookWithAuthors>
 
     @Transaction
     @Query("SELECT * FROM tbBook WHERE bookId = :bookId")
@@ -30,4 +35,10 @@ interface BookstoreDAO {
 
     @Query("DELETE FROM tbBook")
     suspend fun clearBooks()
+
+    @Query("DELETE FROM tbAuthor")
+    suspend fun clearAuthors()
+
+    @Query("DELETE FROM tbBookAuthorCrossRef")
+    suspend fun clearBookAuthorCrossRef()
 }

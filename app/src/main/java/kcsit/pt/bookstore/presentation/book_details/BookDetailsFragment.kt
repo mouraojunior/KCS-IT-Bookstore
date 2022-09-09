@@ -25,7 +25,6 @@ import kcsit.pt.bookstore.util.Extensions.makeToast
 import kcsit.pt.bookstore.util.Extensions.toVerticalString
 import kcsit.pt.bookstore.util.Resource
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -61,7 +60,7 @@ class BookDetailsFragment : Fragment(R.layout.fragment_book_details) {
                         setFavoriteMenuIcon(menuItem)
                         true
                     }
-                else -> false
+                    else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)

@@ -2,8 +2,8 @@ package kcsit.pt.bookstore.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import kcsit.pt.bookstore.databinding.BookListItemBinding
@@ -12,7 +12,7 @@ import kcsit.pt.bookstore.domain.model.Book
 class BookstoreListAdapter(
     private val onItemClick: (Book) -> Unit,
 ) :
-    ListAdapter<Book, BookstoreListAdapter.BookstoreListViewHolder>(BookstoreComparator()) {
+    PagingDataAdapter<Book, BookstoreListAdapter.BookstoreListViewHolder>(BookstoreComparator()) {
 
     inner class BookstoreListViewHolder(private val binding: BookListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -22,7 +22,10 @@ class BookstoreListAdapter(
                 .replace("http", "https"))
 
             binding.root.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) onItemClick(getItem(adapterPosition))
+                if (adapterPosition != RecyclerView.NO_POSITION)
+                    getItem(adapterPosition)?.let {
+                        onItemClick(it)
+                    }
             }
         }
     }

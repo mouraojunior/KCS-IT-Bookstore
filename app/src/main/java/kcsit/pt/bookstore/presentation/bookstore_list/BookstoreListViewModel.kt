@@ -2,6 +2,7 @@ package kcsit.pt.bookstore.presentation.bookstore_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kcsit.pt.bookstore.domain.model.Book
 import kcsit.pt.bookstore.domain.repository.BookstoreRepository
@@ -16,10 +17,14 @@ import javax.inject.Inject
 class BookstoreListViewModel @Inject constructor(
     private val bookstoreRepository: BookstoreRepository,
 ) : ViewModel() {
-    private val _bookstoreItemsState = MutableSharedFlow<Resource<List<Book>>>()
+    private val _bookstoreItemsState = MutableSharedFlow<Resource<PagingData<Book>>>()
     val bookstoreItemsState = _bookstoreItemsState.asSharedFlow()
 
     private var _isFilterActive: Boolean = false
+
+    init {
+        getBooksVolumes(true, isFilterActive())
+    }
 
     fun onEvent(event: BookListEvent) {
         when (event) {
@@ -36,6 +41,8 @@ class BookstoreListViewModel @Inject constructor(
             bookstoreRepository.getVolumes(
                 hasInternetConnection = hasInternetConnection,
                 isFilterActive = isFilterActive).collect { bookstoreState ->
+//                _bookstoreItemsState.emit(bookstoreState)
+
                 when (bookstoreState) {
                     is Resource.Error -> {
                         _bookstoreItemsState.emit(Resource.Loading(false))

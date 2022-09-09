@@ -1,6 +1,7 @@
 package kcsit.pt.bookstore.di
 
 import android.app.Application
+import androidx.paging.ExperimentalPagingApi
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
@@ -35,8 +36,12 @@ object BookstoreModule {
 
     @Singleton
     @Provides
+    @ExperimentalPagingApi
     fun provideBookstoreRepository(bookstoreApi: BookstoreApi, db: BookstoreDatabase): BookstoreRepository =
-        BookstoreRepositoryImpl(bookstoreApi = bookstoreApi, bookstoreDAO = db.bookstoreDao)
+        BookstoreRepositoryImpl(
+            bookstoreApi = bookstoreApi,
+            bookstoreDAO = db.bookstoreDao,
+            db = db)
 
     @Singleton
     @Provides

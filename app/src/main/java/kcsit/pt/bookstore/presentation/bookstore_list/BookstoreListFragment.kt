@@ -24,7 +24,6 @@ import kcsit.pt.bookstore.util.Extensions.makeToast
 import kcsit.pt.bookstore.util.Extensions.safeNavigate
 import kcsit.pt.bookstore.util.Resource
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
@@ -37,16 +36,17 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
         bookstoreListBinding = FragmentBookstoreListBinding.bind(view)
 
         createAdapterAndItemClick()
-        getBooks(bookstoreListViewModel.isFilterActive())
         setBookstoreRecyclerView()
         collectObservables()
         createMenu()
+        getBooks(requireContext().isNetworkAvailable(), bookstoreListViewModel.isFilterActive())
+
     }
 
-    private fun getBooks(isFilterActive: Boolean) {
+    private fun getBooks(hasInternetConnection: Boolean, isFilterActive: Boolean) {
         bookstoreListViewModel.onEvent(BookListEvent.GetBooks(
-            hasInternetConnection = requireContext().isNetworkAvailable(),
-        isFilterActive = isFilterActive))
+            hasInternetConnection = hasInternetConnection,
+            isFilterActive = isFilterActive))
     }
 
     private fun setBookstoreRecyclerView() {
@@ -81,10 +81,13 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.menu_list_filter_favorite -> {
-                        if (bookstoreListViewModel.isFilterActive())
+                        if (bookstoreListViewModel.isFilterActive()) {
                             bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = false))
-                        else bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = true))
-                        getBooks(bookstoreListViewModel.isFilterActive())
+                            getBooks(hasInternetConnection = requireContext().isNetworkAvailable(), bookstoreListViewModel.isFilterActive())
+                        } else {
+                            bookstoreListViewModel.onEvent(BookListEvent.SetFilter(isFilterActive = true))
+                            getBooks(hasInternetConnection = false, bookstoreListViewModel.isFilterActive())
+                        }
                         setFilterMenuIcon(menuItem)
                         true
                     }
@@ -119,7 +122,9 @@ class BookstoreListFragment : Fragment(R.layout.fragment_bookstore_list) {
                             is Resource.Loading -> bookstoreListBinding.pbLoading.visibility = View.VISIBLE
                             is Resource.Success -> {
                                 bookstoreListBinding.pbLoading.visibility = View.GONE
-                                bookstoreListAdapter.submitList(bookListState.data ?: emptyList())
+                                bookListState.data?.let {
+                                    bookstoreListAdapter.submitData(bookListState.data)
+                                }
                             }
                         }
                     }
